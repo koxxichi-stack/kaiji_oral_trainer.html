@@ -1,89 +1,42 @@
-<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>海事代理士 口述試験トレーナー</title>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>海事代理士 口述試験対策・船舶法37問</title>
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;margin:0;background:#f5f7fb;color:#172033}
-main{max-width:760px;margin:auto;padding:22px}
-.card{background:white;border-radius:16px;padding:22px;box-shadow:0 4px 18px #00000012}
-h1{font-size:24px;margin:0 0 8px}.sub{color:#667085;margin-bottom:20px}
-.q{font-size:22px;line-height:1.6;font-weight:700;margin:18px 0}
-button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 16px;margin:5px 4px;cursor:pointer;background:#e8edf7;color:#172033}
-.primary{background:#1769e0;color:white}.good{background:#16803c;color:white}.bad{background:#c73535;color:white}
-#answer{display:none;background:#f1f5f9;padding:15px;border-radius:12px;margin-top:14px;line-height:1.6}
-#status{min-height:24px;color:#475467;margin-top:12px}
-.score{margin-top:18px;font-size:14px;color:#667085}
-</style>
-</head>
-<body>
-<main>
-<div class="card">
-<h1>海事代理士 口述試験トレーナー</h1>
-<div class="sub">Safari / Chrome対応・音声読み上げ</div>
-<div id="counter"></div>
-<div class="q" id="question"></div>
-<div>
-<button class="primary" id="speak">🔊 問題を読み上げる</button>
-<button id="stop">⏹ 読み上げ停止</button>
-</div>
-<div>
-<button id="show">模範解答を見る</button>
-<button id="next">次の問題 ▶</button>
-</div>
-<div id="answer"></div>
-<div>
-<button class="bad rate" data-v="bad">不正解</button>
-<button class="rate" data-v="close">惜しい</button>
-<button class="good rate" data-v="good">正解</button>
-</div>
-<div id="status"></div>
-<div class="score" id="score"></div>
-</div>
-</main>
-<script>
-const questions=[
- {q:"海事代理士法の目的を答えてください。",a:"海事代理士の制度を定め、その業務の適正を図り、海事に関する行政手続の円滑化に資することです。"},
- {q:"海事代理士が業務を行うために必要な登録について答えてください。",a:"海事代理士試験に合格するなど所定の資格を有し、海事代理士名簿への登録を受ける必要があります。"},
- {q:"船舶の総トン数とは何を表すものですか。",a:"船舶の大きさを、その閉囲場所の容積を基礎として表す指標です。"},
- {q:"船舶国籍証書はどのような船舶に関係する証書ですか。",a:"日本船舶の国籍を公証するための証書です。"},
- {q:"船員法上、船長の重要な職務を一つ答えてください。",a:"船舶の安全な運航、船内秩序の維持、乗組員の監督などを行います。"}
-];
-let i=0, score={good:0,close:0,bad:0};
-const $=id=>document.getElementById(id);
+*{box-sizing:border-box}body{margin:0;background:#f3f5f7;color:#17202a;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+main{max-width:720px;margin:auto;padding:16px}.card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 4px 18px #00000012}
+h1{font-size:23px;margin:0 0 4px}.sub{color:#607080;margin-bottom:14px}.progress{font-weight:700;margin:10px 0}.q{font-size:21px;line-height:1.65;min-height:150px;padding:12px 0}
+button,select{font-size:17px;border-radius:13px;padding:14px;border:0}select{width:100%;background:#eef1f4;margin-bottom:10px}
+button{background:#e7ebef;margin:5px 0}.full{width:100%}.blue{background:#1769d2;color:#fff}.green{background:#168a50;color:#fff}
+.answer{display:none;background:#f4f7f9;border-radius:13px;padding:15px;line-height:1.7;margin:10px 0}.heard{min-height:28px;color:#536273;margin:8px 0}
+.row{display:flex;gap:7px}.row button{flex:1}.small{font-size:14px;color:#667684;margin:8px 0}.danger{background:#fff0f0}
+</style></head><body><main><div class="card">
+<h1>⚓ 海事代理士 口述試験対策</h1><div class="sub">船舶法・過去問 全37問</div>
+<select id="mode"><option value="order">問1から順番</option><option value="random">ランダム</option><option value="miss">△・×だけ復習</option></select>
+<div class="progress" id="progress"></div><div class="small" id="stats"></div><div class="q" id="q"></div>
+<button class="full blue" onclick="speakQ()">🔊 問題を読み上げる</button>
+<button class="full green" onclick="listen()">🎤 口頭で回答する</button><div class="heard" id="heard"></div>
+<button class="full" onclick="showAnswer()">模範解答を見る</button><div class="answer" id="ans"></div>
+<div class="row"><button class="danger" onclick="rate('x')">× 不正解</button><button onclick="rate('d')">△ 惜しい</button><button onclick="rate('o')">○ 正解</button></div>
+<button class="full" onclick="next()">次の問題 →</button>
+</div></main><script>
+const qs=[{"n": 1, "q": "船舶法上の船籍港の定め方について、原則を全てお答えください。", "a": ["日本国内であること。", "市町村の名称によること。ただし東京都23区は東京都とすること。", "船舶が航行できる水面に接していること。", "所有者の住所に定めること。"]}, {"n": 2, "q": "船舶国籍証書の交付を受けている船舶が譲渡された場合の手続（誰が、どこに、何をすべきか）を順に述べよ。", "a": ["新たな所有者（譲受人）は、", "船籍港を管轄する登記所に、", "所有権移転の登記を申請する。", "管海官庁に、", "変更登録を申請する。", "変更登録申請と同時に、船舶国籍証書の書換を申請する。", "書換後は遅滞なく、書換前の船舶国籍証書を返還する。"]}, {"n": 3, "q": "船舶の総トン数の測度の申請があった場合に、管海官庁が必要があると認めたときは、何を証する書面の提出を求めることができるか、4つ述べよ。", "a": ["造船地", "造船者", "進水の年月", "船舶の原名（船名）"]}, {"n": 4, "q": "日本国内で総トン数の改測を受けた場合の管海官庁の窓口における手数料納付方法を述べよ。", "a": ["（測度）手数料納付書に、", "手数料額に相当する収入印紙を貼付し納付する。"]}, {"n": 5, "q": "信号符字を点附する船舶について述べよ。", "a": ["汽船", "帆船"]}, {"n": 6, "q": "船舶国籍証書の交付を受けている船舶の所有者の氏名又は名称に変更があった場合の手続（誰が、どこに、何をすべきか）を順に述べよ。", "a": ["船舶所有者は、", "船籍港を管轄する登記所に、", "所有者氏名又は名称の変更の登記を申請する。", "管海官庁に、", "変更登録を申請する。", "変更登録申請と同時に、船舶国籍証書の書換を申請する。", "書換後は遅滞なく、書換前の船舶国籍証書を返還する。"]}, {"n": 7, "q": "管海官庁の窓口において総トン数計算書の謄本の交付を申請する場合の手数料の納付方法を述べよ。", "a": ["申請書に、", "手数料額に相当する収入印紙を貼付し納付する。"]}, {"n": 8, "q": "船舶に標示する船名に使用できる文字の種類について、漢字、平仮名以外を全て述べよ。", "a": ["片仮名", "アラビア数字", "ローマ字（アルファベットでも可）", "国土交通大臣の指定する記号"]}, {"n": 9, "q": "船舶国籍証書の交付を受けている船舶の総トン数に変更があった場合の手続（誰が、どこに、何をすべきか）を順に答えてください。", "a": ["船舶所有者は、", "船籍港を管轄する管海官庁に、", "総トン数の改測を申請しなければならない。", "改測後、管海官庁に、", "変更登録を申請しなければならない。", "変更登録申請と同時に、", "船舶国籍証書の書換を申請しなければならない。", "書換後は遅滞なく、書換前の船舶国籍証書を返還しなければならない。"]}, {"n": 10, "q": "仮船舶国籍証書の交付を受けられる場合について述べよ。", "a": ["外国の港に碇泊中に、船舶国籍証書又は仮船舶国籍証書が滅失若しくは毀損し、又は記載事項に変更があった場合。", "外国を航行中に、上記の事由が生じた場合。", "日本国内において、船舶を取得した地を管轄する管海官庁の管轄区域内に船籍港を定めない場合。", "外国において船舶を取得した場合。", "仮船舶国籍証書の有効期間を超え、やむを得ない事由がある場合。"]}, {"n": 11, "q": "外国で交付を受ける仮船舶国籍証書の最長の有効期間を述べよ。", "a": ["1年。"]}, {"n": 12, "q": "船舶国籍証書の検認を受けなければならない期日の定め方について全て述べよ。", "a": ["船舶国籍証書の交付を受けた日又は前回検認を受けた日から、", "総トン数100トン以上の鋼製船舶は4年を、", "総トン数100トン未満の鋼製船舶は2年を、", "木製船舶は1年を、", "経過した後、国土交通大臣（管海官庁）の定める期日（又は船籍港を管轄する管海官庁により延期された期日）。"]}, {"n": 13, "q": "何人でも手数料を納付することにより交付を受けられるものを全て述べよ。", "a": ["総トン数計算書の謄本又は抄本", "登録事項証明書", "旧船舶原簿の謄本又は抄本"]}, {"n": 14, "q": "船舶法施行細則における船舶の種類を全て述べよ。", "a": ["汽船", "帆船"]}, {"n": 15, "q": "管海官庁の窓口において船舶原簿の閲覧を申請する場合の手数料の納付方法を述べよ。", "a": ["手数料納付書に、", "手数料額に相当する収入印紙を貼付し納付する。"]}, {"n": 16, "q": "外国で船舶を取得した場合の手続を順に述べよ。", "a": ["船舶所有者は、", "日本国内に船籍港を定め、", "船籍港を管轄する管海官庁に、", "当該船舶の総トン数の測度を申請しなければならない。", "測度を実施し船舶件名書謄本等が交付された後、船籍港を管轄する登記所に、", "当該船舶の所有権の保存登記を申請しなければならない。", "登記を行い登記済証交付後、管海官庁に、", "当該船舶の登録を申請しなければならない。"]}, {"n": 17, "q": "船舶に標示すべき事項について答えよ。", "a": ["船籍港", "番号（船舶番号）", "総トン数", "喫水の尺度"]}, {"n": 18, "q": "船舶法による総トン数の測度や登録に関する規定が適用されない船舶について全て述べよ。", "a": ["総トン数20トン未満の船舶", "端舟（推進機関及び帆装を有しない船舶）", "櫓櫂のみをもって運転する舟", "主として櫓櫂をもって運転する舟"]}, {"n": 19, "q": "船舶国籍証書の書換が必要となる場合を述べよ。", "a": ["船舶国籍証書の記載事項に変更を生じたとき。", "船舶国籍証書が毀損したとき。"]}, {"n": 20, "q": "管海官庁の窓口における所定の交付申請の手数料納付方法を述べよ。", "a": ["手数料納付書に、", "手数料額に相当する収入印紙を貼付し納付する。"]}, {"n": 21, "q": "船舶国籍証書の交付を受けている船舶の所有者の住所に変更があった場合の手続を述べよ。", "a": ["船舶所有者は、", "船籍港を管轄する登記所に、", "所有者住所の変更の登記を申請しなければならない。", "登記後、管海官庁に、", "変更登録を申請しなければならない。"]}, {"n": 22, "q": "船舶法において、申請・提出先が船籍港を管轄する管海官庁とされている手続を全てお答えください。", "a": ["総トン数の測度申請", "総トン数の改測申請", "検認申請", "船舶国籍証書の提出期日（検認）の延期申請"]}, {"n": 23, "q": "管海官庁が総トン数の測度を行った場合に、申請者が交付を受けるものを2つお答えください。", "a": ["船舶件名書の謄本", "総トン数計算書の謄本"]}, {"n": 24, "q": "管海官庁の窓口において船舶原簿の閲覧を申請する場合の手数料の納付方法をお答えください。", "a": ["申請書に、", "手数料額に相当する収入印紙を貼付し納付する。"]}, {"n": 25, "q": "船舶に標示すべき事項について「船名」「船籍港」以外を全て述べよ。", "a": ["番号（船舶番号）", "総トン数", "喫水の尺度"]}, {"n": 26, "q": "船舶国籍証書の書換又は再交付が必要となる場合についてそれぞれ述べよ。", "a": ["書換：船舶国籍証書の記載事項に変更を生じた場合。", "書換：船舶国籍証書が毀損した場合。", "再交付：船舶国籍証書が滅失した場合。"]}, {"n": 27, "q": "船舶に標示する船名に使用できる文字の種類について、漢字、平仮名、片仮名以外を全て述べよ。", "a": ["アラビア数字", "ローマ字（アルファベット）", "国土交通大臣が指定する記号"]}, {"n": 28, "q": "日本船舶が滅失したとき、沈没したとき、船舶法第20条に掲げる船舶となったとき以外に抹消登録を行わなければならない場合を全て述べよ。", "a": ["日本の国籍を喪失したとき。", "解撤されたとき。", "船舶の存否が3ヶ月間不明となったとき。"]}, {"n": 29, "q": "管海官庁の窓口において登録事項証明の交付を申請する場合の手数料の納付方法を述べよ。", "a": ["申請書に、", "手数料額に相当する収入印紙を貼付し納付する。"]}, {"n": 30, "q": "日本船舶が滅失したとき、沈没したとき、解撤されたとき以外に抹消登録を行わなければならない場合を全て述べよ。", "a": ["日本の国籍を喪失したとき。", "船舶法第20条に掲げる船舶となったとき。", "船舶の存否が3ヶ月間不明となったとき。"]}, {"n": 31, "q": "船舶国籍証書を管海官庁に返還しなければならない場合を全て述べよ。", "a": ["船舶の登録を抹消した場合。", "記載事項変更又は毀損による船舶国籍証書の書換により新証書の交付を受けた場合。", "外国の港で碇泊中又は外国に航行する途中に船舶国籍証書の毀損又は記載事項の変更により、仮船舶国籍証書の交付を受けた場合。"]}, {"n": 32, "q": "仮船舶国籍証書の有効期間の定め方について全て述べよ。", "a": ["外国において交付する場合は1年以内で、", "国内において交付する場合は6ヶ月以内で、", "船籍港に到着できる期間又は船舶国籍証書の交付を受けることができる期間を標準として管海官庁が定める期間。ただし、船舶が船籍港に到着したときは、有効期間満了前でも効力を失う。"]}, {"n": 33, "q": "日本船舶を解撤したが、船舶所有者が抹消登録の手続を行わない場合の抹消登録の手続を全て述べよ。", "a": ["管海官庁は、", "1ヶ月以内に抹消登録をすべきことを船舶所有者に催告し、", "正当な理由なくしてなお船舶所有者が手続を行わないときは、", "職権をもって抹消の登録を行うことができる。"]}, {"n": 34, "q": "船舶国籍証書の検認において、提出期日の延期が認められる場合を述べよ。", "a": ["船舶が外国にある場合。", "その他やむを得ない（正当な）事由がある場合。"]}, {"n": 35, "q": "日本船舶は法令に別段の規定がある場合を除くほか、船舶国籍証書又は仮船舶国籍証書の交付を受けた後でなければ出来ないことを2つ述べよ。", "a": ["日本の国旗を掲げること。", "（船舶を）航行させること。"]}, {"n": 36, "q": "船舶に標示すべき事項について、「名称（船名）」「総トン数」「その他の事項」以外を全て述べよ。", "a": ["船籍港", "番号（船舶番号）", "喫水の尺度"]}, {"n": 37, "q": "船舶所有者において錯誤又は遺漏があることを発見したときに、訂正の申請をすべき事項を全て述べよ。", "a": ["船舶件名書に記載された事項", "登録した事項", "船舶国籍証書又は仮船舶国籍証書に記載された事項"]}];
+let pos=0,current=0;let scores=JSON.parse(localStorage.getItem('kaiji37Scores')||'{}');
+function pick(){
+ const m=document.getElementById('mode').value;
+ if(m==='order'){current=pos%qs.length;pos++}
+ else if(m==='miss'){let p=qs.map((_,i)=>i).filter(i=>scores[i]==='x'||scores[i]==='d');current=p.length?p[Math.floor(Math.random()*p.length)]:Math.floor(Math.random()*qs.length)}
+ else current=Math.floor(Math.random()*qs.length);
+ render();
+}
 function render(){
- $('counter').textContent=`問題 ${i+1} / ${questions.length}`;
- $('question').textContent=questions[i].q;
- $('answer').textContent=questions[i].a;
- $('answer').style.display='none';
- $('status').textContent='';
- $('score').textContent=`正解 ${score.good}　惜しい ${score.close}　不正解 ${score.bad}`;
+ let x=qs[current];document.getElementById('progress').textContent='問 '+x.n+' ／ 37';
+ document.getElementById('q').textContent=x.q;
+ document.getElementById('ans').innerHTML='<b>模範解答</b><br>'+x.a.map(v=>'・'+v).join('<br>');
+ document.getElementById('ans').style.display='none';document.getElementById('heard').textContent='';stats();
 }
-function speak(){
- const text=questions[i].q;
- if(!('speechSynthesis' in window)){ $('status').textContent='このブラウザは音声読み上げに対応していません。'; return; }
- window.speechSynthesis.cancel();
- const u=new SpeechSynthesisUtterance(text);
- u.lang='ja-JP'; u.rate=0.9; u.pitch=1; u.volume=1;
- const voices=window.speechSynthesis.getVoices();
- const ja=voices.find(v=>/^ja/i.test(v.lang));
- if(ja) u.voice=ja;
- u.onstart=()=>{$('status').textContent='問題を読み上げています…';};
- u.onend=()=>{$('status').textContent='読み上げ完了';};
- u.onerror=e=>{$('status').textContent='読み上げエラー：'+(e.error||'不明');};
- window.speechSynthesis.speak(u);
- // Safari対策: 一時停止状態を解除
- setTimeout(()=>{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); },100);
-}
-$('speak').addEventListener('click',speak);
-$('stop').addEventListener('click',()=>{window.speechSynthesis.cancel();$('status').textContent='読み上げを停止しました';});
-$('show').addEventListener('click',()=>{$('answer').style.display='block';});
-$('next').addEventListener('click',()=>{window.speechSynthesis.cancel();i=(i+1)%questions.length;render();});
-document.querySelectorAll('.rate').forEach(b=>b.addEventListener('click',()=>{score[b.dataset.v]++;render();}));
-window.addEventListener('pagehide',()=>{if('speechSynthesis'in window)window.speechSynthesis.cancel();});
-if('speechSynthesis' in window){window.speechSynthesis.getVoices(); setTimeout(()=>window.speechSynthesis.getVoices(),300);}
-render();
-</script>
-</body>
-</html>
+function stats(){let v=Object.values(scores);document.getElementById('stats').textContent='○ '+v.filter(x=>x==='o').length+'　△ '+v.filter(x=>x==='d').length+'　× '+v.filter(x=>x==='x').length}
+function speakQ(){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance('問'+qs[current].n+'。'+qs[current].q);u.lang='ja-JP';u.rate=.88;speechSynthesis.speak(u)}
+function showAnswer(){document.getElementById('ans').style.display='block'}
+function listen(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){document.getElementById('heard').textContent='このブラウザでは音声認識が利用できません。音声で答えた後、模範解答で確認してください。';return}let r=new SR();r.lang='ja-JP';r.interimResults=false;document.getElementById('heard').textContent='🎙️ 聞いています…';r.onresult=e=>{document.getElementById('heard').textContent='あなたの回答：'+e.results[0][0].transcript;showAnswer()};r.onerror=()=>document.getElementById('heard').textContent='音声認識できませんでした。もう一度お試しください。';r.start()}
+function rate(v){scores[current]=v;localStorage.setItem('kaiji37Scores',JSON.stringify(scores));stats();setTimeout(next,250)}
+function next(){pick()}document.getElementById('mode').onchange=()=>{pos=0;pick()};render();
+</script></body></html>
